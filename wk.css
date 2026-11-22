@@ -1,0 +1,33 @@
+/* WellKept Widgets : base commune. Les couleurs viennent de wk.js (variables CSS). */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg, #fff); }
+body {
+  font-family: var(--font); color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px; -webkit-font-smoothing: antialiased;
+}
+.card {
+  width: 100%; max-width: 380px; background: var(--card);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 16px 12px; text-align: center;
+}
+.eyebrow { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.big, .grid b { font-variant-numeric: lining-nums tabular-nums; line-height: 1.05; }
+.rule { display: flex; align-items: center; gap: 8px; margin: 12px 0 10px; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+button {
+  font: inherit; cursor: pointer; border-radius: 999px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink); padding: 6px 12px; font-size: 12px;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+button:hover { border-color: var(--accent); }
+button:active { transform: scale(.96); }
+button.main { background: var(--accent); border-color: var(--accent); color: var(--card); }
+button.on { border-color: var(--accent); color: var(--accent); }
+.row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.wk-brand { margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 10px; letter-spacing: .05em; color: var(--muted); opacity: .85; }
+.wk-brand svg { width: 16px; height: 12px; color: var(--ink); }
+.track { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.track i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .4s; }
+@media (max-width: 300px) { .grid b { font-size: 20px !important; } }
+@media (max-width: 260px) { body { padding: 4px; } .card { padding: 10px 10px 8px; } }
