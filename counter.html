@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily counter · WellKept Widgets</title>
+<script src="wk.js"></script>
+<link rel="stylesheet" href="wk.css">
+<style>
+  .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .head .eyebrow { text-align: left; }
+  .ico { width: 34px; height: 34px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); display: grid; place-items: center; color: var(--accent); }
+  .ico svg { width: 20px; height: 20px; }
+  .val { font-size: 40px; margin: 10px 0 2px; }
+  .val small { font-size: 15px; color: var(--muted); }
+  .pips { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin: 10px 0 12px; }
+  .pips i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--accent); }
+  .pips i.on { background: var(--accent); }
+  .done { font-size: 12px; color: var(--accent2); min-height: 16px; margin-top: 8px; }
+  .row button { min-width: 44px; font-size: 16px; padding: 6px 14px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head"><div class="eyebrow" id="label">Water</div><div class="ico" id="ico"></div></div>
+  <div class="val big" id="val">0</div>
+  <div class="pips" id="pips"></div>
+  <div class="track" id="trackwrap" style="display:none"><i id="bar"></i></div>
+  <div class="row" style="margin-top:12px">
+    <button id="minus" aria-label="Remove one">−</button>
+    <button class="main" id="plus" aria-label="Add one">+</button>
+  </div>
+  <div class="done" id="done"></div>
+  <div id="wk-brand"></div>
+</div>
+<script>
+/* Réglages : &label=Water &goal=8 &step=1 &unit=glasses &icon=water|coffee|book|steps|star|heart|moon|leaf
+   &reset=daily|never &id=water (chaque compteur a son id pour garder sa valeur) */
+(function () {
+  var ICONS = {
+    water: '<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>',
+    coffee: '<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9z"/><path d="M16 11h2a2 2 0 0 1 0 4h-2"/><path d="M8 3v3M12 3v3"/>',
+    book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/>',
+    steps: '<path d="M7 16c-2 0-3-2-3-5s1-6 3-6 3 3 3 6-1 5-3 5zM17 20c-2 0-3-2-3-4s1-5 3-5 3 3 3 5-1 4-3 4z"/>',
+    star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+    heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+    moon: '<path d="M20 14A8 8 0 0 1 10 4a8 8 0 1 0 10 10z"/>',
+    leaf: '<path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19l7-7"/>'
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  var label = WK.param("label", "Water"), goal = WK.num("goal", 8, 1, 100000), step = WK.num("step", 1, 0.01, 100000);
+  var unit = WK.param("unit", ""), daily = WK.param("reset", "daily") !== "never";
+  var icon = ICONS[WK.param("icon", "water")] || ICONS.star;
+  $("label").textContent = label;
+  $("ico").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + icon + "</svg>";
+  var st = WK.store("counter-" + (WK.param("id") ? "" : label.toLowerCase().replace(/\W+/g, "-"))), s = st.get({});
+  var v = daily && s.day !== WK.today() ? 0 : s.v || 0;
+  var pipsMode = goal / step <= 12;
+  if (!pipsMode) { $("pips").style.display = "none"; $("trackwrap").style.display = "block"; }
+  function fmt(n) { return Math.round(n * 100) / 100; }
+  function draw() {
+    $("val").innerHTML = fmt(v) + '<small> / ' + fmt(goal) + (unit ? " " + unit : "") + "</small>";
+    if (pipsMode) {
+      var n = Math.round(goal / step), on = Math.round(v / step), h = "";
+      for (var i = 0; i < n; i++) h += '<i class="' + (i < on ? "on" : "") + '"></i>';
+      $("pips").innerHTML = h;
+    } else $("bar").style.width = Math.min(100, v / goal * 100) + "%";
+    $("done").textContent = v >= goal ? "Goal reached today ✓" : "";
+    st.set({ day: WK.today(), v: v });
+  }
+  $("plus").onclick = function () { v = fmt(v + step); draw(); };
+  $("minus").onclick = function () { v = Math.max(0, fmt(v - step)); draw(); };
+  draw();
+})();
+</script>
+</body>
+</html>
