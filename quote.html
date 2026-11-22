@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quote of the day · WellKept Widgets</title>
+<script src="wk.js"></script>
+<link rel="stylesheet" href="wk.css">
+<style>
+  .card { padding: 18px 18px 12px; cursor: pointer; }
+  .mark { font-family: Georgia, serif; font-size: 44px; line-height: 1; color: var(--accent); height: 26px; margin-top: 8px; overflow: hidden; }
+  .text { font-size: 18px; line-height: 1.45; margin: 6px 4px 10px; font-style: italic; transition: opacity .25s; }
+  .who { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .hint { font-size: 10px; color: var(--muted); opacity: .7; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="card" id="card" title="Tap for another quote">
+  <div class="eyebrow" id="title">Quote of the day</div>
+  <div class="mark">“</div>
+  <div class="text" id="text"></div>
+  <div class="who" id="who"></div>
+  <div class="hint" id="hint">tap for another</div>
+  <div id="wk-brand"></div>
+</div>
+<script>
+/* Réglages : &set=study|calm|focus|business|all  &title=Daily%20reminder
+   Citation fixe : &text=…&author=…  (alors pas de rotation). Toutes les citations sont d'auteurs du domaine public. */
+(function () {
+  var Q = {
+    study: [
+      ["Learning never exhausts the mind.", "Leonardo da Vinci"],
+      ["The roots of education are bitter, but the fruit is sweet.", "Aristotle"],
+      ["The beginning is the most important part of the work.", "Plato"],
+      ["Knowing is not enough; we must apply.", "Johann Wolfgang von Goethe"],
+      ["Well begun is half done.", "Aristotle"],
+      ["It does not matter how slowly you go as long as you do not stop.", "Confucius"],
+      ["Genius is one percent inspiration and ninety-nine percent perspiration.", "Thomas Edison"],
+      ["Either write something worth reading or do something worth writing.", "Benjamin Franklin"]
+    ],
+    calm: [
+      ["Nature does not hurry, yet everything is accomplished.", "Lao Tzu"],
+      ["Adopt the pace of nature: her secret is patience.", "Ralph Waldo Emerson"],
+      ["Very little is needed to make a happy life.", "Marcus Aurelius"],
+      ["Dwell on the beauty of life.", "Marcus Aurelius"],
+      ["Keep your face always toward the sunshine.", "Walt Whitman"],
+      ["Wherever you go, go with all your heart.", "Confucius"],
+      ["Rest is not idleness.", "John Lubbock"],
+      ["The happiness of your life depends upon the quality of your thoughts.", "Marcus Aurelius"]
+    ],
+    focus: [
+      ["A journey of a thousand miles begins with a single step.", "Lao Tzu"],
+      ["Lost time is never found again.", "Benjamin Franklin"],
+      ["Begin at once to live.", "Seneca"],
+      ["While we wait for life, life passes.", "Seneca"],
+      ["The best way out is always through.", "Robert Frost"],
+      ["It is not enough to be busy. The question is: what are we busy about?", "Henry David Thoreau"],
+      ["Go confidently in the direction of your dreams.", "Henry David Thoreau"],
+      ["Be not afraid of going slowly; be afraid only of standing still.", "Chinese proverb"]
+    ],
+    business: [
+      ["Well done is better than well said.", "Benjamin Franklin"],
+      ["Diligence is the mother of good luck.", "Benjamin Franklin"],
+      ["Energy and persistence conquer all things.", "Benjamin Franklin"],
+      ["Luck is what happens when preparation meets opportunity.", "Seneca"],
+      ["Well arranged time is the surest mark of a well arranged mind.", "Isaac Pitman"],
+      ["Do what you can, with what you have, where you are.", "Theodore Roosevelt"],
+      ["Rome was not built in a day.", "Proverb"],
+      ["He who has a why can bear almost any how.", "Friedrich Nietzsche"]
+    ]
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  $("title").textContent = WK.param("title", "Quote of the day");
+  var fixed = WK.param("text", "");
+  if (fixed) {
+    $("text").textContent = fixed; $("who").textContent = WK.param("author", "");
+    $("hint").remove(); $("card").style.cursor = "default"; return;
+  }
+  var set = WK.param("set", "all");
+  var list = Q[set] || [].concat(Q.study, Q.calm, Q.focus, Q.business);
+  var d = new Date(), seed = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5) + d.getFullYear();
+  var i = seed % list.length;
+  function show() {
+    var t = $("text"); t.style.opacity = 0;
+    setTimeout(function () { t.textContent = list[i][0]; $("who").textContent = "— " + list[i][1]; t.style.opacity = 1; }, 150);
+  }
+  $("card").onclick = function () { i = (i + 1) % list.length; show(); };
+  show();
+})();
+</script>
+</body>
+</html>
