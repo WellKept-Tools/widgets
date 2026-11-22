@@ -35,7 +35,7 @@
 </div>
 <script>
 /* Réglages : &label=Water &goal=8 &step=1 &unit=glasses &icon=water|coffee|book|steps|star|heart|moon|leaf
-   &reset=daily|never &id=water (chaque compteur a son id pour garder sa valeur) */
+   &reset=daily|weekly|never (weekly : remise à zéro le lundi) &id=water (chaque compteur a son id pour garder sa valeur) */
 (function () {
   var ICONS = {
     water: '<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>',
@@ -49,12 +49,17 @@
   };
   var $ = function (id) { return document.getElementById(id); };
   var label = WK.param("label", "Water"), goal = WK.num("goal", 8, 1, 100000), step = WK.num("step", 1, 0.01, 100000);
-  var unit = WK.param("unit", ""), daily = WK.param("reset", "daily") !== "never";
+  var unit = WK.param("unit", ""), reset = WK.param("reset", "daily");
+  function period() {
+    if (reset !== "weekly") return WK.today();
+    var d = new Date(); d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+    return "w" + d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
   var icon = ICONS[WK.param("icon", "water")] || ICONS.star;
   $("label").textContent = label;
   $("ico").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + icon + "</svg>";
   var st = WK.store("counter-" + (WK.param("id") ? "" : label.toLowerCase().replace(/\W+/g, "-"))), s = st.get({});
-  var v = daily && s.day !== WK.today() ? 0 : s.v || 0;
+  var v = reset !== "never" && s.day !== period() ? 0 : s.v || 0;
   var pipsMode = goal / step <= 12;
   if (!pipsMode) { $("pips").style.display = "none"; $("trackwrap").style.display = "block"; }
   function fmt(n) { return Math.round(n * 100) / 100; }
@@ -65,8 +70,8 @@
       for (var i = 0; i < n; i++) h += '<i class="' + (i < on ? "on" : "") + '"></i>';
       $("pips").innerHTML = h;
     } else $("bar").style.width = Math.min(100, v / goal * 100) + "%";
-    $("done").textContent = v >= goal ? "Goal reached today ✓" : "";
-    st.set({ day: WK.today(), v: v });
+    $("done").textContent = v >= goal ? (reset === "weekly" ? "Goal reached this week ✓" : reset === "never" ? "Goal reached ✓" : "Goal reached today ✓") : "";
+    st.set({ day: period(), v: v });
   }
   $("plus").onclick = function () { v = fmt(v + step); draw(); };
   $("minus").onclick = function () { v = Math.max(0, fmt(v - step)); draw(); };
