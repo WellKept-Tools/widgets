@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WellKept Widgets for Notion</title>
+<style>
+  :root { --bg: #F7F6F3; --ink: #2B2A27; --muted: #6F6D68; --line: #E4E2DC; --accent: #3F7F6E; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Arial, sans-serif; background: var(--bg); color: var(--ink); padding: 28px 16px 48px; }
+  header { max-width: 1100px; margin: 0 auto 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  header svg { width: 44px; height: 32px; }
+  h1 { font-size: 24px; }
+  header p { color: var(--muted); font-size: 14px; flex-basis: 100%; }
+  .bar { max-width: 1100px; margin: 0 auto 18px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--muted); }
+  .bar button { font: inherit; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; cursor: pointer; color: var(--ink); }
+  .bar button.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .w { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .w iframe { width: 100%; height: 340px; border: 0; display: block; }
+  .w .meta { padding: 10px 12px 12px; border-top: 1px solid var(--line); }
+  .w h2 { font-size: 14px; margin-bottom: 6px; }
+  .w code { display: block; font-size: 11px; background: var(--bg); border-radius: 8px; padding: 7px 8px; word-break: break-all; color: var(--muted); }
+  .w button { margin-top: 8px; font: inherit; font-size: 12px; border: 1px solid var(--accent); color: var(--accent); background: #fff; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+  footer { max-width: 1100px; margin: 26px auto 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+<header>
+  <svg viewBox="0 0 72 52" aria-hidden="true"><g transform="translate(3.5,-3.5)" fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,26 20,44 31,28 42,44" stroke="#1E2B33"/><polyline points="42,44 57,15" stroke="#3F7F6E"/></g></svg>
+  <h1>WellKept Widgets for Notion</h1>
+  <p>Copy a link, then in Notion type <b>/embed</b>, paste it and press Enter. Drag the bottom edge of the embed to resize it.</p>
+</header>
+<div class="bar" id="themes">Theme:</div>
+<div class="grid" id="grid"></div>
+<footer>Your counters and timer sessions are saved in your own browser only (nothing is sent anywhere). Free widgets made by WellKept Tools.</footer>
+<script>
+  var THEMES = ["notion-light", "notion-dark", "ivory", "evergreen", "violet", "blush", "sage", "pixel"];
+  var W = [
+    ["Clock & week", "clock.html", ""],
+    ["Focus timer", "pomodoro.html", "&focus=25&short=5&long=15&goal=4"],
+    ["Water counter", "counter.html", "&label=Water&goal=8&unit=glasses&icon=water&id=water"],
+    ["Coffee counter", "counter.html", "&label=Coffee&goal=3&unit=cups&icon=coffee&id=coffee"],
+    ["Reading counter", "counter.html", "&label=Pages%20read&goal=30&step=5&unit=pages&icon=book&id=pages"],
+    ["Countdown", "countdown.html", "&label=Final%20exams"],
+    ["Quote of the day", "quote.html", "&set=study"]
+  ];
+  var base = location.href.replace(/[^/]*(\?.*)?$/, "");
+  var cur = new URLSearchParams(location.search).get("theme") || "notion-light";
+  function url(w) { return base + w[1] + "?theme=" + cur + w[2]; }
+  function render() {
+    document.getElementById("themes").innerHTML = "Theme:" + THEMES.map(function (t) {
+      return '<button class="' + (t === cur ? "on" : "") + '" data-t="' + t + '">' + t + "</button>";
+    }).join("");
+    document.getElementById("grid").innerHTML = W.map(function (w, i) {
+      var u = url(w);
+      return '<div class="w"><iframe loading="lazy" src="' + u + '" title="' + w[0] + '"></iframe><div class="meta"><h2>' + w[0] +
+        '</h2><code>' + u.replace(/&/g, "&amp;") + '</code><button data-i="' + i + '">Copy link</button></div></div>';
+    }).join("");
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.dataset;
+    if (t.t) { cur = t.t; render(); }
+    if (t.i !== undefined) {
+      var u = url(W[+t.i]);
+      (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function () { e.target.textContent = "Copied ✓"; },
+        function () { prompt("Copy this link:", u); });
+    }
+  });
+  render();
+</script>
+</body>
+</html>
