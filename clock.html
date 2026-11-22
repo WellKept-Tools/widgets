@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clock · WellKept Widgets</title>
+<script src="wk.js"></script>
+<link rel="stylesheet" href="wk.css">
+<style>
+  .time { font-size: 54px; margin: 4px 0 2px; letter-spacing: .02em; }
+  .time small { font-size: 18px; color: var(--muted); margin-left: 4px; }
+  .greet { font-size: 14px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
+  .week span { font-size: 11px; padding: 5px 0; border-radius: 8px; color: var(--muted); }
+  .week span b { display: block; font-size: 13px; color: var(--ink); font-weight: 600; }
+  .week span.on { background: var(--accent); color: var(--card); }
+  .week span.on b { color: var(--card); }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="eyebrow" id="date"></div>
+  <div class="time big" id="time">--:--</div>
+  <div class="greet" id="greet"></div>
+  <div class="week" id="week"></div>
+  <div id="wk-brand"></div>
+</div>
+<script>
+/* Réglages : &h12=1 (format 12 h)  &seconds=1  &greeting=0  &week=0  &name=Emma */
+(function () {
+  var h12 = WK.param("h12") === "1", sec = WK.param("seconds") === "1";
+  var name = WK.param("name", "");
+  if (WK.param("greeting") === "0") document.getElementById("greet").remove();
+  if (WK.param("week") === "0") document.getElementById("week").remove();
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function draw() {
+    var d = new Date(), h = d.getHours(), suf = "";
+    if (h12) { suf = h < 12 ? "AM" : "PM"; h = h % 12 || 12; }
+    var t = (h12 ? h : pad(h)) + ":" + pad(d.getMinutes()) + (sec ? ":" + pad(d.getSeconds()) : "");
+    document.getElementById("time").innerHTML = t + (suf ? "<small>" + suf + "</small>" : "");
+    document.getElementById("date").textContent = d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+    var g = document.getElementById("greet");
+    if (g) {
+      var hh = d.getHours(), part = hh < 5 ? "Good night" : hh < 12 ? "Good morning" : hh < 18 ? "Good afternoon" : "Good evening";
+      g.textContent = part + (name ? ", " + name : "") + ".";
+    }
+    var w = document.getElementById("week");
+    if (w) {
+      var start = new Date(d); start.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+      var html = "";
+      for (var i = 0; i < 7; i++) {
+        var x = new Date(start); x.setDate(start.getDate() + i);
+        var on = x.toDateString() === d.toDateString();
+        html += '<span class="' + (on ? "on" : "") + '">' + x.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2) + "<b>" + x.getDate() + "</b></span>";
+      }
+      w.innerHTML = html;
+    }
+  }
+  draw(); setInterval(draw, 1000);
+})();
+</script>
+</body>
+</html>
