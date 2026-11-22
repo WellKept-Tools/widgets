@@ -19,6 +19,18 @@
   .dots { margin-top: 10px; font-size: 12px; color: var(--muted); }
   .dots i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--line); margin: 0 2px; vertical-align: middle; }
   .dots i.on { background: var(--accent); }
+  /* Hauteur Notion par défaut (320 px) : version compacte, rien à régler à la main */
+  @media (max-height: 360px) {
+    .ring { width: 128px; height: 128px; margin: 2px auto 8px; }
+    .ring b { font-size: 29px; }
+    #modes { margin: 8px 0 6px !important; }
+    .dots { margin-top: 8px; }
+  }
+  @media (max-height: 360px) and (max-width: 280px) {
+    .ring { width: 112px; height: 112px; }
+    .ring b { font-size: 26px; }
+    #modes button { padding: 4px 9px; font-size: 11px; }
+  }
 </style>
 </head>
 <body>
